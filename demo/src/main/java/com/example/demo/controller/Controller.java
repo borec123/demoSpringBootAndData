@@ -24,8 +24,8 @@ public class Controller {
 	@Autowired
 	private CarRepository carRepository;
 
-	@GetMapping("/reverse/{text}")
-	public String reverse(@PathVariable String text) {
+	@GetMapping("/list")
+	public String list() {
         String json;
         try {
 			List<Car> a = carRepository.findAll();
@@ -51,7 +51,7 @@ public class Controller {
 
 	@GetMapping("/reverse2/{text}")
 	public String reverse2(@PathVariable String text) {
-		return "kokot2";
+		return "koabc";
 	}
 
 	@PostMapping(path = "/post", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
