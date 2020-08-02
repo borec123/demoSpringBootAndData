@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.repository;
 
 
 import java.io.Serializable;
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import com.example.demo.model.BaseEntity;
+import com.example.demo.entity.BaseEntity;
 
 
 

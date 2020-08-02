@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -14,7 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.engine.jdbc.BlobProxy;
 
 @Entity
-public class Watch extends BaseEntity<Long> {
+public class WatchEntity extends BaseEntity<Long> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,17 +34,18 @@ public class Watch extends BaseEntity<Long> {
 	@Column(name="description", nullable=true, length=2048)
     private String description;
 
-	@Column(name="fountain", nullable=true)
-    private Blob fountain;
-
-	@Transient
-    private String fountainString;
+	/*
+	 * @Column(name="fountain", nullable=true) private Blob fountain;
+	 */
+	
+	@Column(name="fountain", nullable=true, length=2048)
+   private String fountain;
 
 	public Long getId() {
 		return id;
 	}
 
-	public Watch setId(Long id) {
+	public WatchEntity setId(Long id) {
 		this.id = id;
 		return this;
 	}
@@ -53,7 +54,7 @@ public class Watch extends BaseEntity<Long> {
 		return title;
 	}
 
-	public Watch setTitle(String name) {
+	public WatchEntity setTitle(String name) {
 		this.title = name;
 		return this;
 	}
@@ -62,37 +63,47 @@ public class Watch extends BaseEntity<Long> {
 		return price;
 	}
 
-	public void setPrice(int price) {
+	public WatchEntity setPrice(int price) {
 		this.price = price;
+		return this;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public WatchEntity setDescription(String description) {
 		this.description = description;
+		return this;
 	}
 
-	public String getFountainString() {
-		if(fountain != null  ) {
-			try {
-				return (Base64.getEncoder().encodeToString(fountain.getBytes(0, (int)fountain.length())));
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		else {
-			return fountainString;
-		}
+	public String getFountain() {
+		return fountain;
 	}
 
-	public void setFountainString(String fountainString) {
-		this.fountainString = fountainString;
-		byte[] decodedBytes = Base64.getDecoder().decode(fountainString);
-		fountain = BlobProxy.generateProxy(decodedBytes);
+	public WatchEntity setFountain(String fountain) {
+		this.fountain = fountain;
+		return this;
 	}
 
+	/*
+	 * public String getFountainString() { return fountain;
+	 * 
+	 * if(fountain != null ) { try { return
+	 * (Base64.getEncoder().encodeToString(fountain.getBytes(0,
+	 * (int)fountain.length()))); } catch (SQLException e) { throw new
+	 * RuntimeException(e); } } else { return fountainString; }
+	 * 
+	 * }
+	 * 
+	 * public void setFountainString(String fountainString) { this.fountain =
+	 * fountainString;
+	 * 
+	 * byte[] decodedBytes = Base64.getDecoder().decode(fountainString); fountain =
+	 * BlobProxy.generateProxy(decodedBytes);
+	 * 
+	 * }
+	 */
 	/*
 	 * public Blob getFountain() { return fountain; }
 	 * 
