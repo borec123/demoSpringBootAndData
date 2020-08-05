@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
@@ -30,58 +31,61 @@ public class Controller {
 
 	@Autowired
 	private WatchService watchService;
-	
 
 	@GetMapping("/list")
 	public List<WatchEntity> list() {
-        try {
+		try {
 			List<WatchEntity> all = watchService.list();
 			return all;
-        } 
-        catch (Exception e) {
-        	handleError(e);
-        }
+		} catch (Exception e) {
+			handleError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		return null;
-        
+
 	}
-	
+
 	@PutMapping("/insertwatch")
-	//@ResponseStatus(HttpStatus.CREATED)
+	// @ResponseStatus(HttpStatus.CREATED)
 	ResponseEntity<Watch> insertWatch(@RequestBody Watch newWatch) {
 		try {
-    		  watchService.insert(newWatch);
-	    	  return ResponseEntity.created(null).body(newWatch);
+			watchService.insert(newWatch);
+			return ResponseEntity.created(null).body(newWatch);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			handleError(e, HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			handleError(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-        catch (Exception e) {
-        	handleError(e);
-        }
 		return null;
 	}
-	
+
 	@PutMapping("/updatewatch/{id}")
-	//@ResponseStatus(HttpStatus..CREATED)
+	// @ResponseStatus(HttpStatus..CREATED)
 	ResponseEntity<Watch> replaceWatch(@RequestBody Watch newWatch, @PathVariable Long id) {
+		try {
+			watchService.update(newWatch, id);
+			return ResponseEntity.ok().body(newWatch);
+		} catch (EntityNotFoundException e) {
+			handleError(e, HttpStatus.NOT_FOUND);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			handleError(e, HttpStatus.BAD_REQUEST);
+		}  catch (Exception e) {
+			handleError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return null;
+	}
 
+	@ResponseBody
+	@ExceptionHandler(Exception.class)
+	ResponseEntity<Exception> handleError(Exception ex, HttpStatus status) {
+		ex.printStackTrace();
+		return ResponseEntity.status(status).body(ex);
+	}
 
-	  watchService.update(newWatch, id);
-	  return ResponseEntity.accepted().body(newWatch);
-
-	  }	
-	  
-	  @ResponseBody
-	  @ExceptionHandler(Exception.class)
-	  @ResponseStatus(HttpStatus.NOT_FOUND)
-	  String handleError(Exception ex) {
-		  ex.printStackTrace();
-	    return ex.getMessage();
-	  }
-	
 	@PostConstruct
 	public void init() {
-		
+
 		watchService.createMockData();
-		
-		 		 
+
 	}
 
 	@PostMapping(path = "/post", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_XML_VALUE)

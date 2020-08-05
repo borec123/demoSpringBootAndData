@@ -43,7 +43,7 @@ public class WatchEntity extends BaseEntity<Long> {
 	 */	 
 	
 	
-	@Column(name="fountain", nullable=true, length=2048) 
+	@Column(name="fountain", nullable=true) 
 	@Lob
 	private String fountain;
 	 

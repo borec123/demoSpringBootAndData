@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 
 /**
  * This is a client test testing a running REST endpoint using HttpClient.
- * Excluded from Maven build. (This is NOT a common JUnit test.) 
+ * Excluded from Maven build. (Note that this is NOT a common JUnit test.) 
  */
 class RESTClientTest {
 
@@ -28,6 +28,18 @@ class RESTClientTest {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
     
+    /**
+     * Inserts a watch containing data from file.json.
+     * This is doing exactly the same as following command:
+     * 
+     * curl -v -X PUT localhost:8080/insertwatch -H 'Content-type:application/json' -d 
+     * '{"title": "Prim","price": "250000", "description": "A watch with a water fountain picture",
+     * "fountain":"R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="}'
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     //@Disabled
     @Test
 	void testInsertWatch() throws IOException, InterruptedException, URISyntaxException {
@@ -46,6 +58,13 @@ class RESTClientTest {
 		
 	}
 	
+    /**
+     *  Inserts a watch containing data from bigfile.json.
+     *  
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     @Test
 	void testInsertWatchBigFile() throws IOException, InterruptedException, URISyntaxException {
 		
@@ -63,6 +82,14 @@ class RESTClientTest {
 		
 	}
 	
+    /**
+     * Tests a wrong case.
+     * Inserts a watch containing data from wrongfile.json.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     @Test
 	void testInsertWatchWrongInput() throws IOException, InterruptedException, URISyntaxException {
 		
@@ -102,6 +129,9 @@ class RESTClientTest {
 		return responseCode;
 	}
 
+    /**
+     * Returns all {@link com.example.demo.entity.WatchEntity} entities.
+     */
 	//@Disabled
     @Test
 	void testList() {
@@ -125,5 +155,50 @@ class RESTClientTest {
 			fail("Exception");
 		}
 	}
+    
+
+    /**
+     * Updates a watch od id '2' with data containing in file.json.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
+    @Test
+ 	void testUpdateWatch() throws IOException, InterruptedException, URISyntaxException {
+ 		
+         
+ 		HttpRequest request = HttpRequest.newBuilder()
+ 				.uri(URI.create("http://localhost:8080/updatewatch/2"))
+ 		        .header("Content-Type", "application/json")
+ 				.PUT(BodyPublishers.ofFile(Paths.get(
+ 						getClass().getResource("file.json").toURI())))
+ 				.build();
+ 		
+         int responseCode = processResponse(request);
+         
+ 		assertEquals(HttpStatus.OK.value(), responseCode);
+ 		
+ 	}
+ 	
+    @Test
+ 	void testUpdateWatchNotFound() throws IOException, InterruptedException, URISyntaxException {
+ 		
+         
+ 		HttpRequest request = HttpRequest.newBuilder()
+ 				.uri(URI.create("http://localhost:8080/updatewatch/999"))
+ 		        .header("Content-Type", "application/json")
+ 				.PUT(BodyPublishers.ofFile(Paths.get(
+ 						getClass().getResource("file.json").toURI())))
+ 				.build();
+ 		
+         int responseCode = processResponse(request);
+         
+ 		assertEquals(HttpStatus.NOT_FOUND.value(), responseCode);
+ 		
+ 	}
+ 	
+
+    
 
 }
