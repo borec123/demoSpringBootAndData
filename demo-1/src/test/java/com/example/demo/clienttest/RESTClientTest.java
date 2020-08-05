@@ -18,8 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 /**
- * This is a client test testing a running REST endpoint using HttpClient.
- * Excluded from Maven build. (Note that this is NOT a common JUnit test.) 
+ * This is a client test which is testing a running REST endpoint using HttpClient.
+ * Excluded from Maven build. 
+ * (Note that this is NOT a common JUnit test.) 
  */
 class RESTClientTest {
 
@@ -158,7 +159,7 @@ class RESTClientTest {
     
 
     /**
-     * Updates a watch od id '2' with data containing in file.json.
+     * Updates a watch of id '2' with data containing in file.json.
      * 
      * @throws IOException
      * @throws InterruptedException
@@ -181,6 +182,14 @@ class RESTClientTest {
  		
  	}
  	
+    
+    /**
+     * Updates a watch of non-existing id 999.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     @Test
  	void testUpdateWatchNotFound() throws IOException, InterruptedException, URISyntaxException {
  		

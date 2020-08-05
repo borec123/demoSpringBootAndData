@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.WatchEntity;
 import com.example.demo.pojo.Watch;
@@ -38,9 +39,8 @@ public class Controller {
 			List<WatchEntity> all = watchService.list();
 			return all;
 		} catch (Exception e) {
-			handleError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
-		return null;
 
 	}
 
@@ -51,11 +51,10 @@ public class Controller {
 			watchService.insert(newWatch);
 			return ResponseEntity.created(null).body(newWatch);
 		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
-			handleError(e, HttpStatus.BAD_REQUEST);
+			return ResponseEntity.badRequest().body(newWatch);
 		} catch (Exception e) {
-			handleError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(newWatch);
 		}
-		return null;
 	}
 
 	@PutMapping("/updatewatch/{id}")
@@ -64,22 +63,17 @@ public class Controller {
 		try {
 			watchService.update(newWatch, id);
 			return ResponseEntity.ok().body(newWatch);
-		} catch (EntityNotFoundException e) {
-			handleError(e, HttpStatus.NOT_FOUND);
-		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
-			handleError(e, HttpStatus.BAD_REQUEST);
+		} /*
+			 * catch (EntityNotFoundException e) { throw new
+			 * ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage()); }
+			 */ catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			return ResponseEntity.badRequest().body(newWatch);
 		}  catch (Exception e) {
-			handleError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(newWatch);
 		}
-		return null;
 	}
 
-	@ResponseBody
-	@ExceptionHandler(Exception.class)
-	ResponseEntity<Exception> handleError(Exception ex, HttpStatus status) {
-		ex.printStackTrace();
-		return ResponseEntity.status(status).body(ex);
-	}
+
 
 	@PostConstruct
 	public void init() {
