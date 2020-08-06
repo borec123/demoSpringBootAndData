@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 /**
  * This is a client test which is testing a running REST endpoint using HttpClient.
  * Excluded from Maven build. 
- * (Note that this is NOT a common JUnit test.) 
+ * (Note that this is NOT a typical JUnit test.) 
  */
 class RESTClientTest {
 

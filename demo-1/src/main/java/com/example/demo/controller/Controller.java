@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class Controller {
 	}
 
 	@PutMapping("/insertwatch")
-	ResponseEntity<Watch> insertWatch(@RequestBody Watch newWatch) {
+	ResponseEntity<Watch> insertWatch(@Valid @RequestBody Watch newWatch) {
 		try {
 			watchService.insert(newWatch);
 			return ResponseEntity.created(null).body(newWatch);
@@ -50,7 +51,7 @@ public class Controller {
 	}
 
 	@PutMapping("/updatewatch/{id}")
-	ResponseEntity<Watch> replaceWatch(@RequestBody Watch newWatch, @PathVariable Long id) {
+	ResponseEntity<Watch> replaceWatch(@Valid @RequestBody Watch newWatch, @PathVariable Long id) {
 		try {
 			watchService.update(newWatch, id);
 			return ResponseEntity.ok().body(newWatch);

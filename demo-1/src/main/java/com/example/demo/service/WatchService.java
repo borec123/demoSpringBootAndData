@@ -1,16 +1,15 @@
 package com.example.demo.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
-import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.WatchEntity;
 import com.example.demo.pojo.Watch;
@@ -69,8 +68,8 @@ public class WatchService {
 	}
 
 	public void createMockData() {
-		watchRepository.save(new WatchEntity().setTitle("Mock watch 1"));
-		watchRepository.save(new WatchEntity().setTitle("Mock watch 2"));
+		watchRepository.save(new WatchEntity().setTitle("Mock watch 1").setPrice(BigDecimal.ONE));
+		watchRepository.save(new WatchEntity().setTitle("Mock watch 2").setPrice(BigDecimal.ZERO));
 		watchRepository.flush();
 	}
 
