@@ -31,7 +31,7 @@ class RESTClientTest {
     
     /**
      * Inserts a watch containing data from file.json.
-     * This is doing exactly the same as following command:
+     * It is doing exactly the same as following command:
      * 
      * curl -v -X PUT localhost:8080/insertwatch -H 'Content-type:application/json' -d 
      * '{"title": "Prim","price": "250000", "description": "A watch with a water fountain picture",
@@ -62,6 +62,12 @@ class RESTClientTest {
     /**
      *  Inserts a watch containing data from bigfile.json.
      *  
+     * It is doing exactly the same as following command:
+     * 
+     * curl -v -X PUT localhost:8080/insertwatch -H 'Content-type:application/json' -d 
+     * '{"title": "Prim","price": "250000", "description": "A watch with a VERY BIG fountain picture",
+     * "fountain":"R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADsR0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADsR0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs...
+     * 
      * @throws IOException
      * @throws InterruptedException
      * @throws URISyntaxException
@@ -84,8 +90,14 @@ class RESTClientTest {
 	}
 	
     /**
-     * Tests a wrong case.
+     * Tests a wrong input.
      * Inserts a watch containing data from wrongfile.json.
+     * 
+     * It is doing exactly the same as following command:
+     * 
+     * curl -v -X PUT localhost:8080/insertwatch -H 'Content-type:application/json' -d 
+     * '{"title": "Prim","price": <b>"klm"</b>, "description": "A watch with a water fountain picture",
+     * "fountain":"R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="}'
      * 
      * @throws IOException
      * @throws InterruptedException
@@ -207,6 +219,23 @@ class RESTClientTest {
  		
  	}
  	
+    @Test
+	void testInsertWatchXML() throws IOException, InterruptedException, URISyntaxException {
+		
+        
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("http://localhost:8080/insertwatch"))
+		        .header("Content-Type", "application/xml")
+				.PUT(BodyPublishers.ofFile(Paths.get(
+						getClass().getResource("file.xml").toURI())))
+				.build();
+		
+        int responseCode = processResponse(request);
+        
+		assertEquals(HttpStatus.CREATED.value(), responseCode);
+		
+	}
+	
 
     
 

@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -22,9 +24,17 @@ public class WatchService {
 	private WatchRepository watchRepository;
 
 	@Transactional(readOnly = true)
-	public List<WatchEntity> list() {
+	public List<Watch> list() {
 
-		return watchRepository.findAll();
+		List<Watch> list = new ArrayList<>();
+		watchRepository.findAll().forEach(e -> {
+			list.add(new Watch().setPrice(e.getPrice())
+					.setId(e.getId())
+					.setTitle(e.getTitle())
+					.setDescription(e.getDescription())
+					.setFountain(e.getFountain()));
+		});
+		return list;
 	}
 
 	@Transactional
@@ -50,7 +60,6 @@ public class WatchService {
 	public WatchEntity insert(Watch newWatch) {
 
 		return watchRepository.save(new WatchEntity()
-//	        		.setId(id)
   	        		.setTitle(newWatch.getTitle())
   	        		.setPrice(newWatch.getPrice())
   	        		.setDescription(newWatch.getDescription())
@@ -65,10 +74,5 @@ public class WatchService {
 		watchRepository.flush();
 	}
 
-	/*
-	 * public Object findById(Long id) {
-	 * 
-	 * return watchRepository.findById(id); }
-	 */
 
 }
