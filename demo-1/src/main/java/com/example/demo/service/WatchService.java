@@ -39,20 +39,32 @@ public class WatchService {
 	@Transactional
 	public WatchEntity update(Watch newWatch, Long id) {
 
-		Optional<WatchEntity> e = watchRepository.findById(id);
+		return watchRepository.findById(id).map(
+				watch -> {
+					watch.setTitle(newWatch.getTitle());
+					watch.setDescription(newWatch.getDescription());
+					watch.setPrice(newWatch.getPrice());
+					watch.setFountain(newWatch.getFountain());
+					// watch.setFountain(BlobProxy.generateProxy(newWatch.getFountain().getBytes()));
+					return watchRepository.save(watch);
+				})
+				.orElseThrow();
 
-		if (e.isPresent()) {
-			WatchEntity watch = e.get();
-			watch.setTitle(newWatch.getTitle());
-			watch.setDescription(newWatch.getDescription());
-			watch.setPrice(newWatch.getPrice());
-			watch.setFountain(newWatch.getFountain());
-			// watch.setFountain(BlobProxy.generateProxy(newWatch.getFountain().getBytes()));
-			return watchRepository.save(watch);
-			
-		} else {
-			throw new EntityNotFoundException(String.format("Watch entity with id:%d does not exists.", id));
-		}
+		
+				/*
+				 * Optional<WatchEntity> e = watchRepository.findById(id);
+				 * 
+				 * if (e.isPresent()) { WatchEntity watch = e.get();
+				 * watch.setTitle(newWatch.getTitle());
+				 * watch.setDescription(newWatch.getDescription());
+				 * watch.setPrice(newWatch.getPrice());
+				 * watch.setFountain(newWatch.getFountain()); //
+				 * watch.setFountain(BlobProxy.generateProxy(newWatch.getFountain().getBytes()))
+				 * ; return watchRepository.save(watch);
+				 * 
+				 * } else { throw new EntityNotFoundException(String.
+				 * format("Watch entity with id:%d does not exists.", id)); }
+				 */	
 	}
 
 	@Transactional

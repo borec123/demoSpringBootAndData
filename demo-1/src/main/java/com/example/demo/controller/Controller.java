@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
@@ -31,7 +32,8 @@ public class Controller {
 	public ResponseEntity<List<Watch>> list() {
 		try {
 			List<Watch> all = watchService.list();
-			return new ResponseEntity<>(all, HttpStatus.OK);
+			return ResponseEntity.ok(all);
+			//return new ResponseEntity<>(all, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
@@ -55,6 +57,8 @@ public class Controller {
 		try {
 			watchService.update(newWatch, id);
 			return ResponseEntity.ok().body(newWatch);
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(newWatch);
 		} catch (EntityNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(newWatch);
 			//throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
