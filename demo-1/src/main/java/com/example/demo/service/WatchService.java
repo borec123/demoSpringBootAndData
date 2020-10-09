@@ -38,6 +38,8 @@ public class WatchService {
 
 	@Transactional
 	public WatchEntity update(Watch newWatch, Long id) {
+		
+		System.out.println(Thread.currentThread().getName() + ": updating entity id: " + id);
 
 		return watchRepository.findById(id).map(
 				watch -> {
