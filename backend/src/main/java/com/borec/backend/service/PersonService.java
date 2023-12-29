@@ -46,4 +46,9 @@ public class PersonService {
         return personRepository.save(person);
     }
 
+    public Long findByFirstNameCrossJoin(String name) {
+        return personRepository.findByFirstNameCrossJoin(name);
+    }
+
+
 }

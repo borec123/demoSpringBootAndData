@@ -63,5 +63,32 @@ public class RESTClientTest {
         return responseCode;
     }
 
+    private static final int THREAD_COUNT = 4;
 
+    @Test
+    public void testMassThread() throws InterruptedException {
+
+        double timeSum = 0.0;
+
+        RESTTestThread[] threads = new RESTTestThread[THREAD_COUNT];
+
+
+        threads[0] = new RESTTestThread("t" + 0);
+        threads[1] = new RESTTestThread("t" + 1);
+        threads[2] = new RESTTestThread("t" + 2);
+        threads[3] = new RESTTestThread("t" + 3);
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            threads[i].start();
+        }
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            threads[i].join();
+        }
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            timeSum += threads[i].getTimeSum();
+        }
+
+        System.out.println("Average response time (ms): " + timeSum / (THREAD_COUNT * RESTTestThread.ATTEMPT_COUNT));
+
+    }
 }
