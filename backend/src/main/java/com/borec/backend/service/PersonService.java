@@ -20,11 +20,11 @@ public class PersonService {
     @Transactional(readOnly = true)
     public List<Person> list() {
 
-/*        try {
+        try {
             Thread.sleep(1000);
         } catch (InterruptedException e1) {
             e1.printStackTrace();
-        }*/
+        }
 
         List<Person> list =  personRepository.findAll();
 

@@ -50,7 +50,7 @@ public class Controller {
     ResponseEntity<Person> insertWatch( @RequestBody Person person) {
         try {
             Person p = personService.insert(person);
-            return ResponseEntity.created(null).body(person);
+            return ResponseEntity.created(null).body(p);
         } catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
             return ResponseEntity.badRequest().body(person);
         } catch (Exception e) {
