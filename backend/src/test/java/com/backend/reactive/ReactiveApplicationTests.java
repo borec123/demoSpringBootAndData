@@ -1,10 +1,10 @@
-package com.borec.backend;
+package com.backend.reactive;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BackendApplicationTests {
+class ReactiveApplicationTests {
 
 	@Test
 	void contextLoads() {

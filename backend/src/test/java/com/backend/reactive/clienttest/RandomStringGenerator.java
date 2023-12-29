@@ -1,4 +1,4 @@
-package com.borec.backend.clienttest;
+package com.backend.reactive.clienttest;
 
 public class RandomStringGenerator {
 

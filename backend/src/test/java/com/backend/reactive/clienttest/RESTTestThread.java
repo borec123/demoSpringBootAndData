@@ -1,11 +1,14 @@
-package com.borec.backend.clienttest;
+package com.backend.reactive.clienttest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.nio.file.Paths;
 import java.time.Duration;
 
 import org.springframework.http.HttpStatus;

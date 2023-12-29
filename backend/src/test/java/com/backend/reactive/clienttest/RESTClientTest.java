@@ -1,4 +1,4 @@
-package com.borec.backend.clienttest;
+package com.backend.reactive.clienttest;
 
 import java.io.IOException;
 import java.net.URI;
@@ -8,9 +8,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -25,19 +23,28 @@ public class RESTClientTest {
             .build();
 
     @Test
-    void testInsertWatch() throws IOException, InterruptedException, URISyntaxException {
+    void testInsertWatch() throws IOException, InterruptedException {
 
+        String json = "{\"firstName\": \"Leoš\",\"lastName\": \"Mareš\", \"avatar\": \"https://gravatar.com/avatar/99df1a5b2917db695be7ad69e46d9164?s=400&d=robohash&r=x\"}";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8082/insertwatch"))
                 .header("Content-Type", "application/json")
-                .PUT(BodyPublishers.ofFile(Paths.get(
-                        Objects.requireNonNull(getClass().getResource("person.json")).toURI())))
+                .PUT(BodyPublishers.ofString(json))
                 .build();
 
         int responseCode = processResponse(request);
 
         assertEquals(HttpStatus.CREATED.value(), responseCode);
+
+    }
+
+    @Test
+    void testInsert50Watches() throws IOException, InterruptedException {
+
+        for (int i = 0; i < 500; i++) {
+            testInsertWatch();
+        }
 
     }
 
