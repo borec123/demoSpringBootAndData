@@ -23,21 +23,40 @@ public class RESTClientTest {
             .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
+    static final String HOST_ = "localhost";
+    static final String PORT_ = "8080";
+
+    @Test
+    void testList() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/list"))
+                .setHeader("User-Agent", "Java 11 HttpClient Bot") // add request header
+                .build();
+
+        int responseCode = processResponse(request);
+        assertEquals(HttpStatus.OK.value(), responseCode);
+    }
 
     @Test
     void testInsertWatch() throws IOException, InterruptedException, URISyntaxException {
-
-
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8082/insertwatch"))
+                .uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/insertwatch"))
                 .header("Content-Type", "application/json")
                 .PUT(BodyPublishers.ofFile(Paths.get(
                         Objects.requireNonNull(getClass().getResource("person.json")).toURI())))
                 .build();
 
         int responseCode = processResponse(request);
-
         assertEquals(HttpStatus.CREATED.value(), responseCode);
+    }
+
+    @Test
+    void testInsert500Watches() throws IOException, InterruptedException, URISyntaxException {
+
+        for (int i = 0; i < 500; i++) {
+            testInsertWatch();
+        }
 
     }
 
@@ -63,7 +82,7 @@ public class RESTClientTest {
         return responseCode;
     }
 
-    private static final int THREAD_COUNT = 4;
+    private static final int THREAD_COUNT = 10;
 
     @Test
     public void testMassThread() throws InterruptedException {
@@ -72,11 +91,9 @@ public class RESTClientTest {
 
         RESTTestThread[] threads = new RESTTestThread[THREAD_COUNT];
 
-
-        threads[0] = new RESTTestThread("t" + 0);
-        threads[1] = new RESTTestThread("t" + 1);
-        threads[2] = new RESTTestThread("t" + 2);
-        threads[3] = new RESTTestThread("t" + 3);
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            threads[i] = new RESTTestThread("t" + i);
+        }
 
         for (int i = 0; i < THREAD_COUNT; i++) {
             threads[i].start();

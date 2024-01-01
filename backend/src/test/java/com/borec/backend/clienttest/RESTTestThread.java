@@ -10,6 +10,7 @@ import java.time.Duration;
 
 import org.springframework.http.HttpStatus;
 
+import static com.borec.backend.clienttest.RESTClientTest.HOST_;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RESTTestThread extends Thread {
@@ -18,7 +19,7 @@ public class RESTTestThread extends Thread {
             .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-	static final int ATTEMPT_COUNT = 2;
+	static final int ATTEMPT_COUNT = 10;
 	private String fileName;
 	private double timeSum = 0.0;
 	
@@ -54,7 +55,7 @@ public class RESTTestThread extends Thread {
 
 		HttpRequest request = HttpRequest.newBuilder()
 				.GET()
-				.uri(URI.create("http://localhost:8082/crossjoin?name=" + RandomStringGenerator.RandGeneratedStr(5)))
+				.uri(URI.create("http://" + RESTClientTest.HOST_ + ":" + RESTClientTest.PORT_ + "/crossjoin?name=" + RandomStringGenerator.RandGeneratedStr(5)))
 				.setHeader("User-Agent", "Java 11 HttpClient Bot") // add request header
 				.build();
 
