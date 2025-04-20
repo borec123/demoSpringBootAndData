@@ -61,6 +61,19 @@ public class Controller {
         }
     }
 
+    @GetMapping("/transfer")
+    ResponseEntity<Double> transfer() {
+    	Double d = null ;
+        try {
+            d = personService.transfer();
+            return ResponseEntity.ok(d);
+        } catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			return ResponseEntity.badRequest().body(d);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(d);
+        }
+    }
+
     @GetMapping(value="/crossjoin", produces = { MediaType.APPLICATION_JSON_VALUE })
     @ResponseStatus(HttpStatus.OK)
     public Long findByFirstNameCrossJoin(@RequestParam("name") String name) {

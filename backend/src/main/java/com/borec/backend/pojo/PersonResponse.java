@@ -11,6 +11,8 @@ public class PersonResponse {
 	List<Person> list;
 	
 	
+	public PersonResponse() { }
+	
 	public PersonResponse(List<Person> list) {
 		super();
 		this.list = list;

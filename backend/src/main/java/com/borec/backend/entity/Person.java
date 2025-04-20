@@ -28,6 +28,9 @@ public class Person {
     @Column(name = "avatar", length = 2048)
     String avatar;
 
+    @Column(name = "score", nullable = false)
+    double score;
+
     public Person(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -70,11 +73,13 @@ public class Person {
         this.avatar = avatar;
     }
 
-    /*
-    id: 1,
-    first_name: "Filip",
-    last_name: "Exot",
-    avatar: "https://gravatar.com/avatar/99df1a5b2917db695be7ad69e46d9164?s=400&d=robohash&r=x"
-*/
+	public double getScore() {
+		return score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
+	}
+
 
 }

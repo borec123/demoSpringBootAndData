@@ -28,22 +28,36 @@ public class PersonService {
 
         List<Person> list =  personRepository.findAll();
 
-
-/*        .forEach(e -> {
-            list.add(new Person().setPrice(e.getPrice())
-                    .setId(e.getId())
-                    .setTitle(e.getTitle())
-                    .setDescription(e.getDescription())
-                    .setFountain(e.getFountain()));
-        });
-        */
-
         return list;
     }
 
     @Transactional
     public Person insert(Person person) {
         return personRepository.save(person);
+    }
+
+    @Transactional
+    public Double transfer() {
+    	
+    	List<Person> list = list();
+    	
+    	Person from = list.get(0);
+    	Person to = list.get(1);
+    	
+    	Double amount = Double.valueOf(10.0d);
+    	
+    	from.setScore(from.getScore() - amount);
+        personRepository.save(from);
+        
+        try {
+			Thread.sleep(8000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        
+    	to.setScore(to.getScore() + amount);
+        personRepository.save(to);
+        return amount;
     }
 
     public Long findByFirstNameCrossJoin(String name) {
