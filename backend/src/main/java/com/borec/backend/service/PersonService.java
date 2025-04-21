@@ -1,10 +1,10 @@
 package com.borec.backend.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.borec.backend.entity.Person;
@@ -17,7 +17,7 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public List<Person> list() {
 
         try {
@@ -31,12 +31,12 @@ public class PersonService {
         return list;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Person insert(Person person) {
         return personRepository.save(person);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Double transfer() {
     	
     	List<Person> list = list();

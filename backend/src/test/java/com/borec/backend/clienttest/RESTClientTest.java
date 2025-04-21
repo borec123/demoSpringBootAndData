@@ -79,7 +79,7 @@ public class RESTClientTest {
         
         List<Person> list = personResponse.getList();
         
-        Person first = list.get(0);
+        Person first = list.get(1);
         
         first.setScore(0d);
         
@@ -94,36 +94,10 @@ public class RESTClientTest {
         int responseCode = processResponsePerson(request).getKey();
         assertEquals(HttpStatus.CREATED.value(), responseCode);
     }
-        
+    
     @Test
     void testTransfer() throws IOException, InterruptedException, URISyntaxException {
 
-    	/*
-    	HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/list"))
-                .setHeader("User-Agent", "Java 11 HttpClient Bot") // add request header
-                .build();
-
-        PersonResponse personResponse = processResponse(request).getValue();
-        
-        List<Person> list = personResponse.getList();
-        
-        Person first = list.get(0);
-        Person second = list.get(1);
-        
-        if(first == null || second == null) {
-        	System.out.println(" NULL !!!");
-        	fail();
-        }
-        
-        
-        ObjectMapper om = new ObjectMapper();
-
-*/
-    	
-        //String str = om.writeValueAsString(first) + om.writeValueAsString(second) + om.writeValueAsString(new Double(10.0));
-        
 		HttpRequest request2 = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/transfer"))
@@ -132,10 +106,9 @@ public class RESTClientTest {
 
         HttpResponse<String> response2 = httpClient.send(request2, HttpResponse.BodyHandlers.ofString());
         
-        
         assertEquals(HttpStatus.OK.value(), response2.statusCode());
     }
-
+    
     @Test
     void testInsert500Watches() throws IOException, InterruptedException, URISyntaxException {
 

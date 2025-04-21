@@ -1,5 +1,7 @@
 package com.borec.backend.controller;
 
+import java.sql.SQLException;
+
 /**
  * TODO user popis
  *
@@ -11,6 +13,7 @@ package com.borec.backend.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-
 import com.borec.backend.entity.Person;
 import com.borec.backend.pojo.PersonResponse;
 import com.borec.backend.service.PersonService;
@@ -30,85 +32,85 @@ import com.borec.backend.service.PersonService;
 @RestController
 public class Controller {
 
-    @Autowired
-    private PersonService personService;
+	@Autowired
+	private PersonService personService;
 
-    @GetMapping("/list")
-    public ResponseEntity<PersonResponse> list() {
-        try {
-           // Thread.sleep(1000);
-/*            List<Person> all = List.of(new Person("Roman", "Sikora"),
-                    new Person("John", "Smith"));
-            return ResponseEntity.ok(new PersonResponse(all));*/
-            List<Person> all = personService.list();
-            return ResponseEntity.ok(new PersonResponse(all));
+	@GetMapping("/list")
+	public ResponseEntity<PersonResponse> list() {
+		try {
+			// Thread.sleep(1000);
+			/*
+			 * List<Person> all = List.of(new Person("Roman", "Sikora"), new Person("John",
+			 * "Smith")); return ResponseEntity.ok(new PersonResponse(all));
+			 */
+			List<Person> all = personService.list();
+			return ResponseEntity.ok(new PersonResponse(all));
 //            return new ResponseEntity<>(new PersonResponse(all), HttpStatus.NOT_MODIFIED);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+		}
 
-    }
+	}
 
-    @PutMapping("/insertwatch")
-    ResponseEntity<Person> insertWatch( @RequestBody Person person) {
-        try {
-            Person p = personService.insert(person);
-            return ResponseEntity.created(null).body(p);
-        } catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
-            return ResponseEntity.badRequest().body(person);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(person);
-        }
-    }
+	@PutMapping("/insertwatch")
+	ResponseEntity<Person> insertWatch(@RequestBody Person person) {
+		try {
+			Person p = personService.insert(person);
+			return ResponseEntity.created(null).body(p);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			return ResponseEntity.badRequest().body(person);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(person);
+		}
+	}
 
-    @GetMapping("/transfer")
-    ResponseEntity<Double> transfer() {
-    	Double d = null ;
-        try {
-            d = personService.transfer();
-            return ResponseEntity.ok(d);
-        } catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+	@GetMapping("/transfer")
+	ResponseEntity<Double> transfer() {
+		Double d = null;
+		try {
+			d = personService.transfer();
+			return ResponseEntity.ok(d);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
 			return ResponseEntity.badRequest().body(d);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(d);
-        }
-    }
+		} catch (CannotAcquireLockException e) {
+			System.out.println("SQL Transaction Deadlock: " + e);
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(d);
+		}
+		catch (Exception e) {
+			System.out.println("Error: " + e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(d);
+		}
+	}
 
-    @GetMapping(value="/crossjoin", produces = { MediaType.APPLICATION_JSON_VALUE })
-    @ResponseStatus(HttpStatus.OK)
-    public Long findByFirstNameCrossJoin(@RequestParam("name") String name) {
-        return personService.findByFirstNameCrossJoin(name);
-    }
+	@GetMapping(value = "/crossjoin", produces = { MediaType.APPLICATION_JSON_VALUE })
+	@ResponseStatus(HttpStatus.OK)
+	public Long findByFirstNameCrossJoin(@RequestParam("name") String name) {
+		return personService.findByFirstNameCrossJoin(name);
+	}
 
-    /*
-
-    @PutMapping("/updatewatch/{id}")
-    ResponseEntity<Watch> replaceWatch(@Valid @RequestBody Watch newWatch, @PathVariable Long id) {
-        try {
-            watchService.update(newWatch, id);
-            return ResponseEntity.ok().body(newWatch);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(newWatch);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(newWatch);
-            //throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
-            return ResponseEntity.badRequest().body(newWatch);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(newWatch);
-        }
-    }
-
-    @PostConstruct
-    public void init() {
-
-        watchService.createMockData();
-
-    }
-
-    @PostMapping(path = "/post", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public String post(@RequestBody String text) {
-        return text;
-    }
-*/
+	/*
+	 * 
+	 * @PutMapping("/updatewatch/{id}") ResponseEntity<Watch>
+	 * replaceWatch(@Valid @RequestBody Watch newWatch, @PathVariable Long id) { try
+	 * { watchService.update(newWatch, id); return
+	 * ResponseEntity.ok().body(newWatch); } catch (NoSuchElementException e) {
+	 * return ResponseEntity.status(HttpStatus.NOT_FOUND).body(newWatch); } catch
+	 * (EntityNotFoundException e) { return
+	 * ResponseEntity.status(HttpStatus.NOT_FOUND).body(newWatch); //throw new
+	 * ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage()); } catch
+	 * (org.springframework.http.converter.HttpMessageNotReadableException e) {
+	 * return ResponseEntity.badRequest().body(newWatch); } catch (Exception e) {
+	 * return
+	 * ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(newWatch); } }
+	 * 
+	 * @PostConstruct public void init() {
+	 * 
+	 * watchService.createMockData();
+	 * 
+	 * }
+	 * 
+	 * @PostMapping(path = "/post", consumes = MediaType.TEXT_PLAIN_VALUE, produces
+	 * = MediaType.APPLICATION_XML_VALUE) public String post(@RequestBody String
+	 * text) { return text; }
+	 */
 }
