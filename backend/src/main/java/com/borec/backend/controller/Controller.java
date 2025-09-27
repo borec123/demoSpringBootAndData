@@ -1,6 +1,6 @@
 package com.borec.backend.controller;
 
-import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * TODO user popis
@@ -25,9 +25,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.borec.backend.entity.Action;
 import com.borec.backend.entity.Person;
+import com.borec.backend.entity.Zprava;
 import com.borec.backend.pojo.PersonResponse;
+import com.borec.backend.pojo.ZpravyResponse;
+import com.borec.backend.service.ActionService;
 import com.borec.backend.service.PersonService;
+import com.borec.backend.service.ZpravaService;
+
+
 
 @RestController
 public class Controller {
@@ -35,6 +42,70 @@ public class Controller {
 	@Autowired
 	private PersonService personService;
 
+	@Autowired
+	private ActionService actionService;
+
+	@Autowired
+	private ZpravaService zpravaService;
+
+
+	@GetMapping("/listzprava")
+	public ResponseEntity<ZpravyResponse> listzprava() {
+		try {
+			
+			/* MOCK data:
+			 * Zprava zprava = new Zprava(); zprava.setCas_od(new Date());
+			 * zprava.setCas_do(new Date()); zprava.setZapnuto(true);
+			 * zprava.setTitulek("Tavba 1"); zprava.setZprava("Tavba 1 ...");
+			 * zpravaService.insert(zprava );
+			 */			
+			
+			List<Zprava> all = zpravaService.list();
+			return ResponseEntity.ok(new ZpravyResponse(all));
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+		}
+	}
+	
+	@GetMapping("/listForClientApplication")
+	public ResponseEntity<ZpravyResponse> listForClientApplication() {
+		try {
+			List<Zprava> all = zpravaService.list();
+			return ResponseEntity.ok(new ZpravyResponse(all));
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+		}
+	}
+	
+	@PutMapping("/insertzprava")
+	ResponseEntity<Zprava> insertZprava(@RequestBody Zprava zprava) {
+		try {
+			Zprava p = zpravaService.insert(zprava);
+			return ResponseEntity.created(null).body(p);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			return ResponseEntity.badRequest().body(zprava);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(zprava);
+		}
+	}
+
+
+	
+	@GetMapping("/listtime")
+	public ResponseEntity<List<Action>> listTime() {
+		try {
+			/*
+			 * Action a = new Action(ActionType.START, System.currentTimeMillis()); return
+			 * List.of(a);
+			 */
+			List<Action> all = actionService.list();
+			return ResponseEntity.ok(all);
+			
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+		}
+
+	}
 	@GetMapping("/list")
 	public ResponseEntity<PersonResponse> list() {
 		try {

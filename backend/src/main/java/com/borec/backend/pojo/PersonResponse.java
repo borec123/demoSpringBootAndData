@@ -34,6 +34,4 @@ public class PersonResponse {
 		return list;
 	}
 
-	
-	
 }

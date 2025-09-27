@@ -32,7 +32,32 @@ public class RESTClientTest {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
     static final String HOST_ = "localhost";
-    static final String PORT_ = "8080";
+    static final String PORT_ = "8194";
+
+    @Test
+    void testListZprava() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/listzprava"))
+                .setHeader("User-Agent", "Java 11 HttpClient Bot") // add request header
+                .build();
+
+        int responseCode = processResponse(request).getKey();
+        assertEquals(HttpStatus.OK.value(), responseCode);
+    }
+
+    @Test
+    void testInsertZprava() throws IOException, InterruptedException, URISyntaxException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/insertzprava"))
+                .header("Content-Type", "application/json")
+                .PUT(BodyPublishers.ofFile(Paths.get(
+                        Objects.requireNonNull(getClass().getResource("zprava.json")).toURI())))
+                .build();
+
+        int responseCode = processResponsePerson(request).getKey();
+        assertEquals(HttpStatus.CREATED.value(), responseCode);
+    }
 
     @Test
     void testList() throws IOException, InterruptedException {
