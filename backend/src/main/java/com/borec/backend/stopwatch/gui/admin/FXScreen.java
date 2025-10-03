@@ -3,13 +3,13 @@ package com.borec.backend.stopwatch.gui.admin;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.borec.backend.entity.Zprava;
 import com.borec.backend.pojo.ZpravyResponse;
@@ -58,7 +58,7 @@ public class FXScreen extends Application {
 	private TextField titleField;
 	private TextArea messageTextArea;
 	private List<Control> formControls;
-	
+
 	// Buttons
 	private Button createBtn = new Button("CREATE");
 	private Button editBtn = new Button("EDIT");
@@ -70,6 +70,7 @@ public class FXScreen extends Application {
 	private ObservableList<MessageFx> data;
 	private Label statusLabel = new Label(OK);
 	private DataLoader dataLoader = new DataLoader();
+	private MessageFx savedMessageFx;
 
 	class DataLoader {
 
@@ -93,19 +94,35 @@ public class FXScreen extends Application {
 		void processResponse(String response) {
 			processResponseFX(response);
 		}
-		
+
+		void processResponseSave(String response) {
+			processResponseSaveFX(response);
+		}
+
 		private Void handleError(Throwable e) {
 			throwable = e;
 			error(e);
 			return null;
 		}
+
+		public void save(Zprava zprava) throws JsonProcessingException {
+			throwable = null;
+
+			ObjectMapper om = new ObjectMapper();
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/saveZprava")).timeout(Duration.ofSeconds(10))
+					.header("Content-Type", "application/json")
+					.PUT(BodyPublishers.ofString(om.writeValueAsString(zprava))).build();
+			httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body)
+					.thenAccept(this::processResponseSave).exceptionally(e -> handleError(e));
+		}
 	}
-	
+
 	void processResponseFX(String response) {
-		//--- zpracovat response ...
-		
+		// --- zpracovat response ...
+
 		String result = "Ok, loaded.";
-		
+
 		ObjectMapper om = new ObjectMapper();
 		try {
 			ZpravyResponse zpravyResponse = om.readValue(response, ZpravyResponse.class);
@@ -114,7 +131,7 @@ public class FXScreen extends Application {
 			data.clear();
 			data.addAll(fxList);
 			table.setItems(data);
-			
+
 		} catch (JsonMappingException e) {
 			result = "Json error: " + e;
 			e.printStackTrace();
@@ -122,22 +139,51 @@ public class FXScreen extends Application {
 			result = "Json error: " + e;
 			e.printStackTrace();
 		}
-		
+
 		final String label = result;
-	
-		
+
 		Platform.runLater(() -> {
 			statusLabel.setText(label);
 		});
 	}
-	
+
+	public void processResponseSaveFX(String response) {
+		String result = "Ok, saved.";
+
+		ObjectMapper om = new ObjectMapper();
+		try {
+			Zprava zprava = om.readValue(response, Zprava.class);
+
+			LongProperty idProp = savedMessageFx.idProperty();
+			long id = idProp.get();
+
+			if (id == MessageFx.NEWLY_CREATED_ID) {
+				MessageFx newMessageFx = MessageConverter.toFx(zprava);
+				data.add(newMessageFx);
+			}
+			table.refresh();
+			setEditable(false); 
+
+		} catch (JsonMappingException e) {
+			result = "Json error: " + e;
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			result = "Json error: " + e;
+			e.printStackTrace();
+		}
+
+		final String label = result;
+
+		Platform.runLater(() -> {
+			statusLabel.setText(label);
+		});
+	}
+
 	public void error(Throwable e) {
 		Platform.runLater(() -> {
 			statusLabel.setText("Network error: " + e);
 		});
 	}
-
-
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -171,12 +217,8 @@ public class FXScreen extends Application {
 		activeCheckBox = new CheckBox("Active");
 		titleField = new TextField();
 		messageTextArea = new TextArea();
-		
-		formControls = List.of(validFromPicker,
-				validToPicker,
-				activeCheckBox,
-				titleField,
-				messageTextArea);
+
+		formControls = List.of(validFromPicker, validToPicker, activeCheckBox, titleField, messageTextArea);
 
 		GridPane form = new GridPane();
 		form.setHgap(10);
@@ -224,6 +266,7 @@ public class FXScreen extends Application {
 				activeCheckBox.setSelected(newSel.isActive());
 				titleField.setText(newSel.getTitle());
 				messageTextArea.setText(newSel.getMessageText());
+				this.savedMessageFx = newSel;
 			}
 		});
 
@@ -231,11 +274,38 @@ public class FXScreen extends Application {
 		createBtn.setOnAction(e -> handleCreate());
 		editBtn.setOnAction(e -> handleEdit());
 		deleteBtn.setOnAction(e -> handleDelete());
+		okBtn.setOnAction(e -> save());
+		cancelBtn.setOnAction(e -> cancel());
 		loadlBtn.setOnAction(e -> load());
 
 		setEditable(false);
 
 		load();
+	}
+
+	private void cancel() {
+		setEditable(false);
+	}
+
+	private void save() {
+		try {
+			if (savedMessageFx != null) {
+				savedMessageFx.setValidFrom(validFromPicker.getValue());
+				savedMessageFx.setValidTo(validToPicker.getValue());
+				savedMessageFx.setActive(activeCheckBox.isSelected());
+				savedMessageFx.setTitle(titleField.getText());
+				savedMessageFx.setMessageText(messageTextArea.getText());
+
+				statusLabel.setText("Saving entity ...");
+
+				Zprava zprava = MessageConverter.toEntity(savedMessageFx);
+				dataLoader.save(zprava);
+			}
+
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void load() {
@@ -249,25 +319,36 @@ public class FXScreen extends Application {
 		deleteBtn.setDisable(yes);
 		okBtn.setDisable(!yes);
 		cancelBtn.setDisable(!yes);
+		table.setDisable(yes);
 		formControls.forEach(c -> c.setDisable(!yes));
 	}
 
 	private void handleCreate() {
-		MessageFx msg = new MessageFx(null, validFromPicker.getValue(), validToPicker.getValue(),
-				activeCheckBox.isSelected(), titleField.getText(), messageTextArea.getText());
-		data.add(msg);
+		setEditable(true);
+
+		idField.setText(null);
+		validFromPicker.setValue(null);
+		validToPicker.setValue(null);
+		activeCheckBox.setSelected(true);
+		titleField.setText(null);
+		messageTextArea.setText(null);
+
+		this.savedMessageFx = new MessageFx();
 	}
 
 	private void handleEdit() {
-		MessageFx selected = table.getSelectionModel().getSelectedItem();
-		if (selected != null) {
-			selected.setValidFrom(validFromPicker.getValue());
-			selected.setValidTo(validToPicker.getValue());
-			selected.setActive(activeCheckBox.isSelected());
-			selected.setTitle(titleField.getText());
-			selected.setMessageText(messageTextArea.getText());
-			table.refresh();
-		}
+		this.savedMessageFx = table.getSelectionModel().getSelectedItem();
+		setEditable(true);
+
+		/*
+		 * MessageFx selected = table.getSelectionModel().getSelectedItem(); if
+		 * (selected != null) { selected.setValidFrom(validFromPicker.getValue());
+		 * selected.setValidTo(validToPicker.getValue());
+		 * selected.setActive(activeCheckBox.isSelected());
+		 * selected.setTitle(titleField.getText());
+		 * selected.setMessageText(messageTextArea.getText()); table.refresh(); }
+		 */
+
 	}
 
 	private void handleDelete() {
@@ -285,6 +366,7 @@ public class FXScreen extends Application {
 	 * JavaFX wrapper for Message entity (with properties for TableView).
 	 */
 	public static class MessageFx {
+		static final long NEWLY_CREATED_ID = -1;
 		private final LongProperty id = new SimpleLongProperty();
 		private final ObjectProperty<LocalDate> validFrom = new SimpleObjectProperty<>();
 		private final ObjectProperty<LocalDate> validTo = new SimpleObjectProperty<>();
@@ -301,6 +383,10 @@ public class FXScreen extends Application {
 			this.active.set(active);
 			this.title.set(title);
 			this.messageText.set(messageText);
+		}
+
+		public MessageFx() {
+			this.id.set(NEWLY_CREATED_ID);
 		}
 
 		// Getters and setters

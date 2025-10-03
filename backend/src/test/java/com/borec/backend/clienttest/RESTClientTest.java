@@ -1,5 +1,7 @@
 package com.borec.backend.clienttest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,7 +15,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,6 @@ import org.springframework.http.HttpStatus;
 import com.borec.backend.entity.Person;
 import com.borec.backend.pojo.PersonResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class RESTClientTest {
 

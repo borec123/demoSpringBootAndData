@@ -1,5 +1,7 @@
 package com.borec.backend.clienttest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -10,9 +12,6 @@ import java.time.Duration;
 
 import org.springframework.http.HttpStatus;
 
-import static com.borec.backend.clienttest.RESTClientTest.HOST_;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class RESTTestThread extends Thread {
 
     private static final HttpClient httpClient = HttpClient.newBuilder()
@@ -20,7 +19,6 @@ public class RESTTestThread extends Thread {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 	static final int ATTEMPT_COUNT = 10;
-	private String fileName;
 	private double timeSum = 0.0;
 	
 	public RESTTestThread(String threadName) {
@@ -46,12 +44,6 @@ public class RESTTestThread extends Thread {
 	}
 
 	private void doCrossJoin(int i) throws IOException, InterruptedException {
-/* 		HttpRequest request = HttpRequest.newBuilder()
- 				.uri(URI.create("http://localhost:8080/crossjoin"))
- 		        .header("Content-Type", "application/json")
- 				.PUT(BodyPublishers.ofFile(Paths.get(
- 						getClass().getResource(this.fileName).toURI())))
- 				.build();*/
 
 		HttpRequest request = HttpRequest.newBuilder()
 				.GET()

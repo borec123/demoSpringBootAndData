@@ -1,7 +1,5 @@
 package com.borec.backend.controller;
 
-import java.util.Date;
-
 /**
  * TODO user popis
  *
@@ -49,17 +47,21 @@ public class Controller {
 	private ZpravaService zpravaService;
 
 
+	@PutMapping("/saveZprava")
+	ResponseEntity<Zprava> saveZprava(@RequestBody Zprava zprava) {
+		try {
+			Zprava p = zpravaService.insert(zprava);
+			return ResponseEntity.created(null).body(p);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			return ResponseEntity.badRequest().body(zprava);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(zprava);
+		}
+	}
+
 	@GetMapping("/listzprava")
 	public ResponseEntity<ZpravyResponse> listzprava() {
 		try {
-			
-			/* MOCK data:
-			 * Zprava zprava = new Zprava(); zprava.setCas_od(new Date());
-			 * zprava.setCas_do(new Date()); zprava.setZapnuto(true);
-			 * zprava.setTitulek("Tavba 1"); zprava.setZprava("Tavba 1 ...");
-			 * zpravaService.insert(zprava );
-			 */			
-			
 			List<Zprava> all = zpravaService.list();
 			return ResponseEntity.ok(new ZpravyResponse(all));
 		} catch (Exception e) {
