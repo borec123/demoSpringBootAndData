@@ -26,8 +26,8 @@ class ZpravyResponseTest {
 		zprava3.setCas_od(new Date());
 		zprava3.setCas_do(new Date());
 		zprava3.setZapnuto(true);
-		zprava3.setTitulek("Tavba 1");
-		zprava3.setZprava("Tavba 1 ...");
+		zprava3.setTitulek("Tavba 2");
+		zprava3.setZprava("Tavba 2 ...");
 
 		List<Zprava> l1 = List.of(zprava);
 		List<Zprava> l2 = List.of(zprava);

@@ -72,8 +72,9 @@ public class Controller {
 	@GetMapping("/listForClientApplication")
 	public ResponseEntity<ZpravyResponse> listForClientApplication() {
 		try {
-			List<Zprava> all = zpravaService.list();
-			return ResponseEntity.ok(new ZpravyResponse(all));
+			List<Zprava> all = zpravaService.listForClientApplication();
+			ZpravyResponse result = new ZpravyResponse(all);
+			return ResponseEntity.ok(result );
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}

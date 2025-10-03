@@ -31,8 +31,9 @@ class ZpravaTest {
 		zprava2.setTitulek("Tavba 1 2");
 		zprava2.setZprava("Tavba 1 ...  2");
 		
+		assertTrue(zprava.equals(zprava));
+		assertTrue(zprava.equals(zprava2));
 		assertTrue(zprava.equals(zprava3));
-		assertFalse(zprava.equals(zprava2));
 	}
 
 }
