@@ -1,5 +1,6 @@
 package com.borec.backend.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class ZpravaService {
     	listLoader.start();
     }
     
+    @Transactional
     class ListForClientApplicationLoader extends Thread {
     	
     	public void run() {
@@ -51,8 +53,9 @@ public class ZpravaService {
     		}
     	}
 
+        @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
 		private void load() {
-	        List<Zprava> list =  zpravaRepository.listForClientApplication();
+	        List<Zprava> list =  zpravaRepository.listForClientApplication(new Date());
 			if(!list.equals(listForClientApplication)) {
 				listForClientApplication = list;
 				System.out.println("listForClientApplication has been replaced.");
