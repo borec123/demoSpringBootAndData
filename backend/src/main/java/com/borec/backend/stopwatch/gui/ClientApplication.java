@@ -24,16 +24,20 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class ClientApplication extends Application {
 
 	protected static final long INTERVAL = 5000;
+	private static final String LABEL = "Zprávy administrátora:";
 	ListView<Zprava> listView;
 	protected static boolean error;
+	VBox bottom;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -42,7 +46,7 @@ public class ClientApplication extends Application {
 
 		listView = new ListView<>();
 		Tooltip tooltip = new Tooltip();
-		tooltip.setText("Seznam zpráv");
+		tooltip.setText(LABEL);
 		listView.setTooltip(tooltip);
 		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -54,7 +58,7 @@ public class ClientApplication extends Application {
 
 					Dialog<String> dialog = new Dialog<String>();
 					// Setting the title
-					dialog.setTitle("Zpráva");
+					dialog.setTitle("Zpráva: " + zprava.getTitulek() );
 					ButtonType type = new ButtonType("Ok", ButtonData.OK_DONE);
 					// Setting the content of the dialog
 					dialog.setContentText(zprava.getZprava());
@@ -65,21 +69,26 @@ public class ClientApplication extends Application {
 			}
 		});
 
-		VBox root = new VBox(20);
+		VBox root = new VBox(0);
 		root.setAlignment(Pos.CENTER);
-		root.setPadding(new Insets(50));
+		root.setPadding(new Insets(5));
 
-		VBox bottom = new VBox(20);
+		bottom = new VBox(2);
 		bottom.setAlignment(Pos.BOTTOM_LEFT);
 		bottom.setPadding(new Insets(0));
-		bottom.getChildren().add(new Label("Seznam zpráv"));
+		Label l = new Label(LABEL);
+		l.setTextFill(Color.color(1, 0, 0));
+
+		bottom.getChildren().add(l);
 		bottom.getChildren().add(listView);
+		bottom.setMaxHeight(80.0);
+		bottom.setVisible(false);
 
 		// Button container
 		HBox centerBox = new HBox(15);
 		centerBox.setAlignment(Pos.CENTER);
-		centerBox.setPadding(new Insets(70));
-		
+		centerBox.setPadding(new Insets(110));
+
 		Label label = new Label("Klientská aplikace");
 		label.setStyle("-fx-font-size: 48px; -fx-font-family: 'Courier New', monospace; -fx-text-fill: #2c3e50;");
 		centerBox.getChildren().add(label);
@@ -117,12 +126,15 @@ public class ClientApplication extends Application {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(INTERVAL);
 						List<Zprava> data = DataLoader.loadDtata();
 						Platform.runLater(() -> {
 							listView.getItems().clear();
-							listView.getItems().addAll(data);
+							if (!data.isEmpty()) {
+								listView.getItems().addAll(data);
+							}
+							bottom.setVisible(!data.isEmpty());
 						});
+						Thread.sleep(INTERVAL);
 
 					} catch (InterruptedException e) {
 						error = true;

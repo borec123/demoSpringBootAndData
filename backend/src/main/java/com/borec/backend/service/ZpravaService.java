@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.borec.backend.entity.Zprava;
+import com.borec.backend.pojo.ZpravyResponse;
 import com.borec.backend.repository.ZpravaRepository;
 
 import jakarta.annotation.PostConstruct;
@@ -19,7 +20,7 @@ public class ZpravaService {
 
     @Autowired
     private ZpravaRepository zpravaRepository;
-	private List<Zprava> listForClientApplication = List.of();
+	private ZpravyResponse listForClientApplication = new ZpravyResponse(List.of());
 	private ListForClientApplicationLoader listLoader = new ListForClientApplicationLoader();
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -34,7 +35,7 @@ public class ZpravaService {
     }
  
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
-    public List<Zprava> listForClientApplication() {
+    public ZpravyResponse listForClientApplication() {
     	return this.listForClientApplication ;
     }
     
@@ -49,17 +50,22 @@ public class ZpravaService {
     	public void run() {
     		while(true) {
     			load();
-    			sleep();
+    			try {
+					sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     		}
     	}
 
         @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
 		private void load() {
-	        List<Zprava> list =  zpravaRepository.listForClientApplication(new Date());
-			if(!list.equals(listForClientApplication)) {
+        	ZpravyResponse list =  new ZpravyResponse(zpravaRepository.listForClientApplication(new Date()));
+			//if(!list.equals(listForClientApplication)) {
 				listForClientApplication = list;
-				System.out.println("listForClientApplication has been replaced.");
-			}
+				//System.out.println("listForClientApplication has been replaced.");
+			//}
 		}
     }
  
