@@ -8,11 +8,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity
-public class Zprava extends BaseEntity<Long> {
+@Entity(name = "ZPRAVA_ARCHIVE")
+public class ZpravaArchive extends BaseEntity<Long> {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
@@ -33,14 +33,21 @@ public class Zprava extends BaseEntity<Long> {
 	@Column(name = "zprava", nullable = false)
 	String zprava;
 
-	@Override
+	@Column(name = "smazano", nullable = false)
+	String smazano;
+
+	public ZpravaArchive(Zprava zprava, ZpravaArchiveCreated created) {
+		this.id = zprava.id;
+		this.cas_od = zprava.cas_od;
+		this.cas_do = zprava.cas_do;
+		this.zapnuto = zprava.zapnuto;
+		this.titulek = zprava.titulek;
+		this.zprava = zprava.zprava;
+		this.smazano = created.toString();
+	}
+	
 	public Long getId() {
 		return id;
-	}
-
-	@Override
-	public String toString() {
-		return titulek;
 	}
 
 	public Date getCas_od() {
@@ -83,8 +90,15 @@ public class Zprava extends BaseEntity<Long> {
 		this.zprava = zprava;
 	}
 
+	public String getSmazano() {
+		return smazano;
+	}
+
+	public void setSmazano(String smazano) {
+		this.smazano = smazano;
+	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
 }

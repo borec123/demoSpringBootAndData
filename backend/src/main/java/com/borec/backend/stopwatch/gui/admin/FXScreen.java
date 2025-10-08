@@ -99,6 +99,10 @@ public class FXScreen extends Application {
 			processResponseSaveFX(response);
 		}
 
+		void processResponseDelete(String response) {
+			processResponseDeleteFX(response);
+		}
+
 		private Void handleError(Throwable e) {
 			throwable = e;
 			error(e);
@@ -115,6 +119,18 @@ public class FXScreen extends Application {
 					.PUT(BodyPublishers.ofString(om.writeValueAsString(zprava))).build();
 			httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body)
 					.thenAccept(this::processResponseSave).exceptionally(e -> handleError(e));
+		}
+
+		public void delete(Zprava zprava) throws JsonProcessingException {
+			throwable = null;
+
+			ObjectMapper om = new ObjectMapper();
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create("http://" + HOST_ + ":" + PORT_ + "/deleteZprava")).timeout(Duration.ofSeconds(10))
+					.header("Content-Type", "application/json")
+					.PUT(BodyPublishers.ofString(om.writeValueAsString(zprava))).build();
+			httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body)
+					.thenAccept(this::processResponseDelete).exceptionally(e -> handleError(e));
 		}
 	}
 
@@ -172,6 +188,21 @@ public class FXScreen extends Application {
 			e.printStackTrace();
 		}
 
+		final String label = result;
+
+		Platform.runLater(() -> {
+			statusLabel.setText(label);
+		});
+	}
+
+	public void processResponseDeleteFX(String response) {
+		String result = "Ok, deleted.";
+
+		MessageFx selected = table.getSelectionModel().getSelectedItem();
+		if (selected != null) {
+			data.remove(selected);
+		}
+		
 		final String label = result;
 
 		Platform.runLater(() -> {
@@ -352,9 +383,16 @@ public class FXScreen extends Application {
 	}
 
 	private void handleDelete() {
-		MessageFx selected = table.getSelectionModel().getSelectedItem();
-		if (selected != null) {
-			data.remove(selected);
+		
+		// TODO: if dialog == yes ...
+		
+		this.savedMessageFx = table.getSelectionModel().getSelectedItem();
+		Zprava zprava = MessageConverter.toEntity(savedMessageFx);
+		statusLabel.setText("Deleting entity ...");
+		try {
+			dataLoader.delete(zprava);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 		}
 	}
 

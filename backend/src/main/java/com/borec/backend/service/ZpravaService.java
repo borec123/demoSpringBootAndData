@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.borec.backend.entity.Zprava;
+import com.borec.backend.entity.ZpravaArchive;
+import com.borec.backend.entity.ZpravaArchiveCreated;
 import com.borec.backend.pojo.ZpravyResponse;
+import com.borec.backend.repository.ZpravaArchiveRepository;
 import com.borec.backend.repository.ZpravaRepository;
 
 import jakarta.annotation.PostConstruct;
@@ -24,19 +27,28 @@ public class ZpravaService {
 
 	@Autowired
 	private ZpravaRepository zpravaRepository;
+	
+	@Autowired
+	private ZpravaArchiveRepository zpravaArchiveRepository;
+	
 	private ZpravyResponse listForClientApplication = new ZpravyResponse(List.of());
 	private Timer timer;
-	private final TimerTask task = new TimerTask() {
-		public void run() {
-			loadAndScheduleNextLoad();
-		}
-	};
+
 
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public Zprava insert(Zprava zprava) {
 		Zprava z = zpravaRepository.save(zprava);
 		Thread.ofVirtual().start(() -> removeSchedulerAndLoadAndScheduleNextLoad());
 		return z;
+	}
+
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
+	public void delete(Zprava zprava) {
+		ZpravaArchive zpravaArchive = new ZpravaArchive(zprava, ZpravaArchiveCreated.USER);
+		zpravaRepository.delete(zprava);
+		zpravaArchiveRepository.save(zpravaArchive);
+		
+		Thread.ofVirtual().start(() -> removeSchedulerAndLoadAndScheduleNextLoad());
 	}
 
 	@Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -109,6 +121,11 @@ public class ZpravaService {
 					.min(Comparator.comparing(Zprava::getCas_do)).orElseThrow(NoSuchElementException::new);
 
 			// --- Schedule a Task Once:
+			final TimerTask task = new TimerTask() {
+				public void run() {
+					loadAndScheduleNextLoad();
+				}
+			};
 			timer = new Timer(); // "Timer"
 			long delay = minByCas_do.getCas_do().getTime() - System.currentTimeMillis();
 			timer.schedule(task, delay);

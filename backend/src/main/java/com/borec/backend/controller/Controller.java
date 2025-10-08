@@ -15,6 +15,7 @@ import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -79,6 +80,7 @@ public class Controller {
 		}
 	}
 	
+	//TODO: remove ?
 	@PutMapping("/insertzprava")
 	ResponseEntity<Zprava> insertZprava(@RequestBody Zprava zprava) {
 		try {
@@ -90,8 +92,18 @@ public class Controller {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(zprava);
 		}
 	}
-
-
+	
+	@PutMapping("/deleteZprava")
+	ResponseEntity<Zprava> deleteZprava(@RequestBody Zprava zprava) {
+		try {
+			zpravaService.delete(zprava);
+			return ResponseEntity.ok().body(zprava);
+		} catch (org.springframework.http.converter.HttpMessageNotReadableException e) {
+			return ResponseEntity.badRequest().body(zprava);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(zprava);
+		}
+	}
 	
 	@GetMapping("/listtime")
 	public ResponseEntity<List<Action>> listTime() {
