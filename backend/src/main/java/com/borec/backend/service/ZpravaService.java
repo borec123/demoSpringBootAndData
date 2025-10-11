@@ -45,7 +45,7 @@ public class ZpravaService {
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public void delete(Zprava zprava) {
 		ZpravaArchive zpravaArchive = new ZpravaArchive(zprava, ZpravaArchiveCreated.USER);
-		zpravaRepository.delete(zprava);
+		zpravaRepository.deleteById(zprava.getId());
 		zpravaArchiveRepository.save(zpravaArchive);
 		
 		Thread.ofVirtual().start(() -> removeSchedulerAndLoadAndScheduleNextLoad());

@@ -25,6 +25,18 @@ titulek varchar(255),
 zprava varchar(2048)
 );
 
+ create table zprava_archive (
+id IDENTITY not null primary key,
+cas_od TIMESTAMP ,
+cas_do TIMESTAMP ,
+zapnuto boolean,
+titulek varchar(255),
+zprava varchar(2048),
+smazano char(1)
+);
+
+
+
 
 update ZPRAVA set ZPRAVA = 'Ruské vojenské letouny v Estonsku nebyly podle generálního tajemníka NATO Marka Rutteho minulý pátek bezprostřední hrozbou, proto je alianční letouny jen doprovodily ven z estonského vzdušného prostoru. Zasahovala tři letadla ze Švédska, Finska a Itálie. Aliance bude na podobné incidenty vždy reagovat s klidným odhodláním řekl Rutte s tím, že pokud to bude nutné, je NATO připraveno letadla vyhodnocená jako nebezpečí i sestřelit.
     „Náš vzkaz Rusům je jasný, budeme bránit každý centimetr našeho území,“ dodal Rutte.
